@@ -12,7 +12,6 @@
 <script>
 import Autocomplete from "@/components/inputs/Autocomplete.vue";
 import { fetchLocations } from "@/api";
-import _ from "lodash";
 
 export default {
   name: "App",
@@ -30,7 +29,9 @@ export default {
 
   created() {
     // some initial pre-loaded data for example
-    this.location = "London, Greater London, England, SW1A 2DX, United Kingdom";
+    this.location = {
+      display_name: "London, Greater London, England, SW1A 2DX, United Kingdom"
+    };
   },
 
   methods: {
@@ -42,9 +43,7 @@ export default {
           const { data } = await fetchLocations(inputText);
 
           if (data && data.length > 0) {
-            this.locations = data
-              .map((location) => _.get(location, "display_name", null))
-              .filter((location) => location);
+            this.locations = data;
           }
         } catch (err) {
           console.error(err);

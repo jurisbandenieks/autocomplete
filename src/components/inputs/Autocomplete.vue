@@ -15,12 +15,12 @@
       <template v-else>
         <li
           v-for="(item, i) in items"
-          :key="item"
+          :key="item.place_id"
           class="autocomplete-result"
           :class="{ 'is-active': i === arrowCounter }"
           @click="setResult(item)"
         >
-          {{ item }}
+          {{ item.display_name }}
         </li>
       </template>
     </ul>
@@ -35,8 +35,10 @@ export default {
 
   props: {
     initialSearch: {
-      type: String,
-      default: ""
+      type: Object,
+      default: () => {
+        return {};
+      }
     },
     items: {
       type: Array,
@@ -65,7 +67,7 @@ export default {
     document.addEventListener("click", this.handleClickOutside);
 
     if (this.initialSearch) {
-      this.search = this.initialSearch;
+      this.search = this.initialSearch.display_name;
     }
   },
 
@@ -81,6 +83,7 @@ export default {
       }
     },
 
+    // debounce to optimize API calls
     onChange: _.debounce(function () {
       this.$emit("search-update", this.search);
 
@@ -92,11 +95,12 @@ export default {
     }, 500),
 
     setResult(val) {
-      this.search = val;
+      this.search = val.display_name;
       this.isOpen = false;
       this.$emit("result-update", val);
     },
 
+    // Keyboard actions
     onArrowDown() {
       if (this.arrowCounter < this.items.length - 1) {
         this.arrowCounter = this.arrowCounter + 1;
