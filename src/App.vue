@@ -24,38 +24,39 @@ export default {
     return {
       locations: [],
       location: "",
-      initialLocation: "London",
+      initialLocation:
+        "London, Greater London, England, SW1A 2DX, United Kingdom",
       loading: false
     };
   },
 
-  mounted() {
-    if (this.initialLocation) {
-      this.getLocations(this.initialLocation);
-    }
-  },
-
   methods: {
     async getLocations(inputText) {
-      this.loading = true;
+      if (inputText) {
+        this.loading = true;
 
-      try {
-        const { data } = await fetchLocations(inputText);
+        try {
+          const { data } = await fetchLocations(inputText);
 
-        if (data && data.length > 0) {
-          this.locations = data
-            .map((location) => _.get(location, "display_name", null))
-            .filter((location) => location);
+          if (data && data.length > 0) {
+            this.locations = data
+              .map((location) => _.get(location, "display_name", null))
+              .filter((location) => location);
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          this.loading = false;
         }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        this.loading = false;
+      } else {
+        this.locations = [];
       }
     },
     setLocation(result) {
-      console.log(result);
-      this.location = result;
+      if (result) {
+        console.log(result);
+        this.location = result;
+      }
     }
   }
 };

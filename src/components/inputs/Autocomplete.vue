@@ -14,13 +14,13 @@
       <li v-if="loading" class="loading">Loading results...</li>
       <template v-else>
         <li
-          v-for="(result, i) in results"
-          :key="result"
+          v-for="(item, i) in items"
+          :key="item"
           class="autocomplete-result"
           :class="{ 'is-active': i === arrowCounter }"
-          @click="setResult(result)"
+          @click="setResult(item)"
         >
-          {{ result }}
+          {{ item }}
         </li>
       </template>
     </ul>
@@ -56,7 +56,6 @@ export default {
     return {
       search: "",
       result: null,
-      results: [],
       isOpen: false,
       arrowCounter: -1
     };
@@ -67,18 +66,11 @@ export default {
 
     if (this.initialSearch) {
       this.search = this.initialSearch;
-      this.isOpen = true;
     }
   },
 
   unmounted() {
     document.removeEventListener("click", this.handleClickOutside);
-  },
-
-  watch: {
-    items(value) {
-      this.results = value;
-    }
   },
 
   methods: {
@@ -89,16 +81,10 @@ export default {
       }
     },
 
-    filterResults() {
-      this.results = this.items.filter(
-        (item) => item.toLowerCase().indexOf(this.search.toLowerCase()) > -1
-      );
-    },
-
     onChange: _.debounce(function () {
+      this.$emit("search-update", this.search);
+
       if (this.search) {
-        this.$emit("search-update", this.search);
-        this.filterResults();
         this.isOpen = true;
       } else {
         this.isOpen = false;
@@ -112,7 +98,7 @@ export default {
     },
 
     onArrowDown() {
-      if (this.arrowCounter < this.results.length - 1) {
+      if (this.arrowCounter < this.items.length - 1) {
         this.arrowCounter = this.arrowCounter + 1;
       }
     },
@@ -124,7 +110,7 @@ export default {
     },
 
     onEnter() {
-      const search = this.results[this.arrowCounter];
+      const search = this.items[this.arrowCounter];
       this.setResult(search);
       this.arrowCounter = -1;
     }
