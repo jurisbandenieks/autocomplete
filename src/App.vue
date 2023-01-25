@@ -2,7 +2,7 @@
   <autocomplete
     :items="locations"
     :loading="loading"
-    :initial-search="initialLocation"
+    :initial-search="location"
     label="Locations"
     @search-update="getLocations"
     @result-update="setLocation"
@@ -24,10 +24,13 @@ export default {
     return {
       locations: [],
       location: "",
-      initialLocation:
-        "London, Greater London, England, SW1A 2DX, United Kingdom",
       loading: false
     };
+  },
+
+  created() {
+    // some initial pre-loaded data for example
+    this.location = "London, Greater London, England, SW1A 2DX, United Kingdom";
   },
 
   methods: {
