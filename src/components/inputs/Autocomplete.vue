@@ -14,10 +14,10 @@
       <li v-if="loading" class="loading">Loading results...</li>
       <template v-else>
         <li
-          v-for="(item, i) in items"
+          v-for="item in items"
           :key="item.place_id"
           class="autocomplete-result"
-          :class="{ 'is-active': i === arrowCounter }"
+          :class="{ 'is-active': item.place_id === getActiveId }"
           @click="setResult(item)"
         >
           {{ item.display_name }}
@@ -73,6 +73,12 @@ export default {
 
   unmounted() {
     document.removeEventListener("click", this.handleClickOutside);
+  },
+
+  computed: {
+    getActiveId() {
+      return _.get(this.items[this.arrowCounter], "place_id", null);
+    }
   },
 
   methods: {
