@@ -10,6 +10,9 @@
       @keydown.up="onArrowUp"
       @keydown.enter="onEnter"
     />
+    <span v-if="clearable" class="autocomplete-clear" @click.stop="onClear()"
+      >X</span
+    >
     <ul v-show="isOpen && items" class="autocomplete-results">
       <li v-if="loading" class="loading">Loading results...</li>
       <template v-else>
@@ -51,6 +54,10 @@ export default {
     label: {
       type: String,
       default: null
+    },
+    clearable: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -101,7 +108,7 @@ export default {
     }, 500),
 
     setResult(val) {
-      this.search = val.display_name;
+      this.search = _.get(val, "display_name", null);
       this.isOpen = false;
       this.$emit("result-update", val);
     },
@@ -123,6 +130,10 @@ export default {
       const search = this.items[this.arrowCounter];
       this.setResult(search);
       this.arrowCounter = -1;
+    },
+
+    onClear() {
+      this.setResult(null);
     }
   }
 };
@@ -132,6 +143,14 @@ export default {
 .autocomplete {
   position: relative;
   width: 400px;
+}
+
+.autocomplete-clear {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(-30px, 30px);
+  cursor: pointer;
 }
 
 .autocomplete-results {

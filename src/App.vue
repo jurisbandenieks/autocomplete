@@ -3,6 +3,7 @@
     :items="locations"
     :loading="loading"
     :initial-search="location"
+    :clearable="true"
     label="Locations"
     @search-update="getLocations"
     @result-update="setLocation"
@@ -55,10 +56,8 @@ export default {
       }
     },
     setLocation(result) {
-      if (result) {
-        console.log(result);
-        this.location = result;
-      }
+      console.log(result);
+      this.location = result;
     }
   }
 };
