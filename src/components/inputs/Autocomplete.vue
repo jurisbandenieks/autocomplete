@@ -10,16 +10,20 @@
       @keydown.up="onArrowUp"
       @keydown.enter="onEnter"
     />
-    <span v-if="clearable" class="autocomplete-clear" @click.stop="onClear()"
-      >X</span
+    <span
+      v-if="clearable"
+      class="material-symbols-outlined autocomplete__clear"
+      @click.stop="onClear()"
     >
-    <ul v-show="isOpen && items" class="autocomplete-results">
+      close
+    </span>
+    <ul v-show="isOpen && items" class="autocomplete__results">
       <li v-if="loading" class="loading">Loading results...</li>
       <template v-else>
         <li
           v-for="item in items"
           :key="item.place_id"
-          class="autocomplete-result"
+          class="autocomplete__result"
           :class="{ 'is-active': item.place_id === getActiveId }"
           @click="setResult(item)"
         >
@@ -143,35 +147,35 @@ export default {
 .autocomplete {
   position: relative;
   width: 400px;
-}
 
-.autocomplete-clear {
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translate(-30px, 30px);
-  cursor: pointer;
-}
+  &__clear {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(-30px, 30px);
+    cursor: pointer;
+  }
 
-.autocomplete-results {
-  padding: 0;
-  margin: 0;
-  border: 1px solid #eeeeee;
-  height: 120px;
-  min-height: 12px;
-  overflow: auto;
-}
+  &__results {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #eeeeee;
+    height: 120px;
+    min-height: 12px;
+    overflow: auto;
+  }
 
-.autocomplete-result {
-  list-style: none;
-  text-align: left;
-  padding: 4px 2px;
-  cursor: pointer;
+  &__result {
+    list-style: none;
+    text-align: left;
+    padding: 4px 2px;
+    cursor: pointer;
 
-  &.is-active,
-  &:hover {
-    background-color: #4aae9b;
-    color: white;
+    &.is-active,
+    &:hover {
+      background-color: #4aae9b;
+      color: white;
+    }
   }
 }
 </style>
