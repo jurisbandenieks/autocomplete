@@ -1,0 +1,23 @@
+{
+    "address": {
+        "country": "France",
+        "country_code": "fr",
+        "county": "Landes",
+        "name": "Le Sen",
+        "postcode": "40420",
+        "state": "Nouvelle-Aquitaine"
+    },
+    "boundingbox": ["44.101395", "44.176761", "-0.563792", "-0.4497139"],
+    "class": "place",
+    "display_address": "Landes, Nouvelle-Aquitaine, 40420, France",
+    "display_name": "Le Sen, Landes, Nouvelle-Aquitaine, 40420, France",
+    "display_place": "Le Sen",
+    "lat": "44.1256573",
+    "licence": "https://locationiq.com/attribution",
+    "lon": "-0.5012634",
+    "osm_id": "1969259",
+    "osm_type": "relation",
+    "place_id": "320860845413",
+    "id": "320860845413",
+    "type": "village"
+}
