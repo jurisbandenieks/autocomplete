@@ -1,22 +1,27 @@
 <template>
-  <autocomplete
-    :items="locations"
-    :initial-search="location"
-    :clearable="true"
-    :show-avatar="true"
-    label="Locations"
-    @search-update="getLocations"
-    @result-update="setLocation"
-  >
-    <template v-if="loading" v-slot:loading
-      ><li>Loading results...</li>
-    </template>
-  </autocomplete>
+  <!-- From vuejs team -->
+  <!-- One caveat is that browsers ignore any form of preventing the submit when the form contains only one input element. only god knows why, but that’s how it is. -->
+  <form @submit.prevent="handleSubmit()">
+    <autocomplete
+      :initial-search="initialSearch"
+      :items="locations"
+      :clearable="true"
+      :show-avatar="true"
+      label="Locations"
+      @search-update="getLocations"
+      @result-update="(e) => (location = e)"
+    >
+      <template v-if="loading" v-slot:loading
+        ><li>Loading results...</li>
+      </template>
+    </autocomplete>
+  </form>
 </template>
 
 <script>
+import _ from "lodash";
 import Autocomplete from "@/components/inputs/Autocomplete.vue";
-import { fetchLocations } from "@/api";
+import { fetchLocation, fetchLocations } from "@/api";
 
 export default {
   name: "App",
@@ -26,17 +31,24 @@ export default {
 
   data() {
     return {
+      initialSearch: "",
       locations: [],
-      location: "",
+      location: {},
       loading: false
     };
   },
 
-  created() {
+  async mounted() {
     // some initial pre-loaded data for example
-    this.location = {
-      display_name: "London, Greater London, England, SW1A 2DX, United Kingdom"
-    };
+    try {
+      const { data } = await fetchLocation();
+
+      if (data) {
+        this.initialSearch = _.get(data, "display_name", "");
+      }
+    } catch (err) {
+      console.error(err);
+    }
   },
 
   methods: {
@@ -45,7 +57,7 @@ export default {
         this.loading = true;
 
         try {
-          const { data } = await fetchLocations(inputText);
+          const data = await fetchLocations(inputText);
 
           if (data && data.length > 0) {
             this.locations = data;
@@ -59,9 +71,8 @@ export default {
         this.locations = [];
       }
     },
-    setLocation(result) {
-      console.log(result);
-      this.location = result;
+    handleSubmit() {
+      console.log("Subitting ->>", this.location);
     }
   }
 };

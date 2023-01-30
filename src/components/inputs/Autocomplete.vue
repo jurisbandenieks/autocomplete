@@ -25,12 +25,12 @@
       <slot name="loading"></slot>
       <li
         v-for="item in items"
-        :key="item.place_id"
+        :key="item.id"
         class="autocomplete__result"
-        :class="{ 'is-active': item.place_id === getActiveId }"
+        :class="{ 'is-active': item.id === getActiveId }"
         @click="setResult(item)"
       >
-        <span>{{ item.display_name }}</span>
+        <span>{{ item.label }}</span>
       </li>
     </ul>
   </div>
@@ -44,10 +44,8 @@ export default {
 
   props: {
     initialSearch: {
-      type: Object,
-      default: () => {
-        return {};
-      }
+      type: String,
+      default: ""
     },
     items: {
       type: Array,
@@ -78,10 +76,6 @@ export default {
 
   mounted() {
     document.addEventListener("click", this.handleClickOutside);
-
-    if (this.initialSearch) {
-      this.search = this.initialSearch.display_name;
-    }
   },
 
   unmounted() {
@@ -90,7 +84,15 @@ export default {
 
   computed: {
     getActiveId() {
-      return _.get(this.items[this.arrowCounter], "place_id", null);
+      return _.get(this.items[this.arrowCounter], "id", null);
+    }
+  },
+
+  watch: {
+    initialSearch(val) {
+      if (!this.search && val) {
+        this.search = val;
+      }
     }
   },
 
@@ -114,7 +116,7 @@ export default {
     }, 500),
 
     setResult(val) {
-      this.search = _.get(val, "display_name", null);
+      this.search = _.get(val, "label", null);
       this.isOpen = false;
       this.$emit("result-update", val);
     },
@@ -140,10 +142,6 @@ export default {
 
     onClear() {
       this.setResult(null);
-    },
-
-    getCountry(val) {
-      return _.get(val, "address.country", "");
     }
   }
 };
