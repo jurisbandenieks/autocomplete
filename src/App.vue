@@ -8,9 +8,8 @@
     @search-update="getLocations"
     @result-update="setLocation"
   >
-    <template v-slot:loading>
-      <!-- content for the loading slot -->
-      <loading v-if="loading">Loading results...</loading>
+    <template v-if="loading" v-slot:loading
+      ><li>Loading results...</li>
     </template>
   </autocomplete>
 </template>

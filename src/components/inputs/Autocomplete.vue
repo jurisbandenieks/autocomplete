@@ -22,7 +22,7 @@
       close
     </span>
     <ul v-show="isOpen && items" class="autocomplete__results">
-      <li><slot name="loading"></slot></li>
+      <slot name="loading"></slot>
       <li
         v-for="item in items"
         :key="item.place_id"
@@ -30,11 +30,6 @@
         :class="{ 'is-active': item.place_id === getActiveId }"
         @click="setResult(item)"
       >
-        <avatar
-          v-if="showAvatar"
-          :src="`https://source.unsplash.com/${getCountry(item)}`"
-          :alt="getCountry(item)"
-        />
         <span>{{ item.display_name }}</span>
       </li>
     </ul>
@@ -43,14 +38,9 @@
 
 <script>
 import _ from "lodash";
-import Avatar from "@/components/Avatar.vue";
 
 export default {
   name: "AutocompleteInput",
-
-  components: {
-    Avatar
-  },
 
   props: {
     initialSearch: {
