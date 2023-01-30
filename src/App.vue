@@ -1,13 +1,18 @@
 <template>
   <autocomplete
     :items="locations"
-    :loading="loading"
     :initial-search="location"
     :clearable="true"
+    :show-avatar="true"
     label="Locations"
     @search-update="getLocations"
     @result-update="setLocation"
-  />
+  >
+    <template v-slot:loading>
+      <!-- content for the loading slot -->
+      <loading v-if="loading">Loading results...</loading>
+    </template>
+  </autocomplete>
 </template>
 
 <script>
@@ -64,14 +69,7 @@ export default {
 </script>
 
 <style lang="scss">
-$bg-color: #424242;
-$hl-color: #2196f3;
-$width: 320px;
-$trans-time: 300ms;
-
-*,
-:before,
-:after {
+* {
   box-sizing: border-box;
 }
 
@@ -79,30 +77,5 @@ $trans-time: 300ms;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
-input {
-  background: none;
-  font-size: 18px;
-  padding: 10px 10px 10px 5px;
-  display: block;
-  width: $width;
-  border: none;
-  border-radius: 0;
-  border-bottom: 1px solid black;
-  &:focus {
-    outline: none;
-  }
-  &:focus ~ label,
-  &:valid ~ label {
-    top: -14px;
-    font-size: 12px;
-    color: $hl-color;
-  }
-  &:focus ~ .bar:before {
-    width: $width;
-  }
 }
 </style>

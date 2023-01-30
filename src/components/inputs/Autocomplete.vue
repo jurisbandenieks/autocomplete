@@ -1,10 +1,14 @@
 <template>
   <div class="autocomplete">
-    <label v-if="label" for="autcomplete">{{ label }}</label>
+    <label v-if="label" for="autcomplete" class="autocomplete__label">
+      {{ label }}
+    </label>
     <input
+      v-model="search"
       name="autocomplete"
       type="text"
-      v-model="search"
+      class="autocomplete__input"
+      :class="{ autocomplete__clearable: clearable }"
       @input="onChange"
       @keydown.down="onArrowDown"
       @keydown.up="onArrowUp"
@@ -18,27 +22,35 @@
       close
     </span>
     <ul v-show="isOpen && items" class="autocomplete__results">
-      <li v-if="loading" class="loading">Loading results...</li>
-      <template v-else>
-        <li
-          v-for="item in items"
-          :key="item.place_id"
-          class="autocomplete__result"
-          :class="{ 'is-active': item.place_id === getActiveId }"
-          @click="setResult(item)"
-        >
-          {{ item.display_name }}
-        </li>
-      </template>
+      <li><slot name="loading"></slot></li>
+      <li
+        v-for="item in items"
+        :key="item.place_id"
+        class="autocomplete__result"
+        :class="{ 'is-active': item.place_id === getActiveId }"
+        @click="setResult(item)"
+      >
+        <avatar
+          v-if="showAvatar"
+          :src="`https://source.unsplash.com/${getCountry(item)}`"
+          :alt="getCountry(item)"
+        />
+        <span>{{ item.display_name }}</span>
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
 import _ from "lodash";
+import Avatar from "@/components/Avatar.vue";
 
 export default {
   name: "AutocompleteInput",
+
+  components: {
+    Avatar
+  },
 
   props: {
     initialSearch: {
@@ -51,15 +63,15 @@ export default {
       type: Array,
       default: () => []
     },
-    loading: {
-      type: Boolean,
-      default: false
-    },
     label: {
       type: String,
       default: null
     },
     clearable: {
+      type: Boolean,
+      default: false
+    },
+    showAvatar: {
       type: Boolean,
       default: false
     }
@@ -138,22 +150,61 @@ export default {
 
     onClear() {
       this.setResult(null);
+    },
+
+    getCountry(val) {
+      return _.get(val, "address.country", "");
     }
   }
 };
 </script>
 
 <style scoped lang="scss">
+$hl-color: #2196f3;
+$width: 100%;
+
 .autocomplete {
   position: relative;
   width: 400px;
 
+  &__label {
+    font-size: 12px;
+  }
+
+  &__input {
+    background: none;
+    font-size: 18px;
+    padding: 10px 10px 10px 5px;
+    margin: 6px 0 0 0;
+    display: block;
+    width: $width;
+    border: none;
+    border-radius: 5px;
+    border: 1px solid black;
+    &:focus {
+      outline: none;
+    }
+    &:focus ~ label,
+    &:valid ~ label {
+      top: -14px;
+      font-size: 12px;
+      color: $hl-color;
+    }
+    &:focus ~ .bar:before {
+      width: $width;
+    }
+  }
+
   &__clear {
     position: absolute;
-    right: 0;
+    right: 6px;
     top: 0;
-    transform: translate(-30px, 30px);
+    transform: translate(0, 33px);
     cursor: pointer;
+  }
+
+  &__clearable {
+    padding: 10px 40px 10px 5px;
   }
 
   &__results {
@@ -166,6 +217,8 @@ export default {
   }
 
   &__result {
+    display: flex;
+    align-items: center;
     list-style: none;
     text-align: left;
     padding: 4px 2px;
@@ -173,7 +226,7 @@ export default {
 
     &.is-active,
     &:hover {
-      background-color: #4aae9b;
+      background-color: #004762;
       color: white;
     }
   }
