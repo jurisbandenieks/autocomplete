@@ -6,6 +6,7 @@
     <input
       v-model="search"
       name="autocomplete"
+      ref="autocomplete"
       type="text"
       class="autocomplete__input"
       :class="{ autocomplete__clearable: clearable }"
@@ -119,6 +120,8 @@ export default {
       this.search = _.get(val, "label", null);
       this.isOpen = false;
       this.$emit("result-update", val);
+
+      this.$refs.autocomplete.focus();
     },
 
     // Keyboard actions
