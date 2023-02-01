@@ -26,12 +26,12 @@
       <slot name="loading"></slot>
       <li
         v-for="item in items"
-        :key="item[keyText]"
+        :key="item[itemValue]"
         class="autocomplete__result"
-        :class="{ 'is-active': item[keyText] === getActiveId }"
+        :class="{ 'is-active': item[itemValue] === getActiveId }"
         @click="setResult(item)"
       >
-        <span>{{ item[valueText] }}</span>
+        <span>{{ item[itemText] }}</span>
       </li>
     </ul>
   </div>
@@ -70,11 +70,11 @@ export default {
       type: Boolean,
       default: false
     },
-    keyText: {
+    itemValue: {
       type: String,
       default: null
     },
-    valueText: {
+    itemText: {
       type: String,
       default: null
     }
@@ -101,14 +101,14 @@ export default {
 
   computed: {
     getActiveId() {
-      return _.get(this.items[this.arrowCounter], this.keyText, null);
+      return _.get(this.items[this.arrowCounter], this.itemValue, null);
     }
   },
 
   watch: {
-    modelValue(value) {
-      if (value && !this.search) {
-        this.search = this.isObject ? value[this.valueText] : value;
+    modelValue(val) {
+      if (val && !this.search) {
+        this.search = this.getSearchText(val);
       }
     }
   },
@@ -135,10 +135,10 @@ export default {
     },
 
     // debounce to optimize API calls
-    onChange: _.debounce(function (value) {
-      this.$emit("search-update", value);
+    onChange: _.debounce(function (val) {
+      this.$emit("search-update", this.search);
 
-      if (value) {
+      if (val) {
         this.isOpen = true;
       } else {
         this.isOpen = false;
@@ -146,7 +146,7 @@ export default {
     }, 500),
 
     setResult(val) {
-      this.search = _.get(val, this.valueText, null);
+      this.search = this.getSearchText(val);
       this.result = val;
       this.isOpen = false;
       this.$emit("result-update", val);
@@ -175,6 +175,10 @@ export default {
 
     onClear() {
       this.setResult(null);
+    },
+
+    getSearchText(val) {
+      return this.isObject ? _.get(val, this.itemText, null) : val;
     }
   }
 };
