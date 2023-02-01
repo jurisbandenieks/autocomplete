@@ -137,13 +137,16 @@ export default {
     // debounce to optimize API calls
     onChange: _.debounce(function (val) {
       this.$emit("search-update", this.search);
+      this.handleDropdown(val);
+    }, 500),
 
+    handleDropdown(val) {
       if (val) {
         this.isOpen = true;
       } else {
         this.isOpen = false;
       }
-    }, 500),
+    },
 
     setResult(val) {
       this.search = this.getSearchText(val);
