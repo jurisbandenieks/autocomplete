@@ -26,12 +26,12 @@
       <slot name="loading"></slot>
       <li
         v-for="item in items"
-        :key="item.id"
+        :key="item[keyText]"
         class="autocomplete__result"
-        :class="{ 'is-active': item.id === getActiveId }"
+        :class="{ 'is-active': item[keyText] === getActiveId }"
         @click="setResult(item)"
       >
-        <span>{{ item.label }}</span>
+        <span>{{ item[valueText] }}</span>
       </li>
     </ul>
   </div>
@@ -44,9 +44,11 @@ export default {
   name: "AutocompleteInput",
 
   props: {
-    initialSearch: {
-      type: String,
-      default: ""
+    modelValue: {
+      type: [String, Object],
+      default: () => {
+        return {};
+      }
     },
     items: {
       type: Array,
@@ -63,6 +65,18 @@ export default {
     showAvatar: {
       type: Boolean,
       default: false
+    },
+    isObject: {
+      type: Boolean,
+      default: false
+    },
+    keyText: {
+      type: String,
+      default: null
+    },
+    valueText: {
+      type: String,
+      default: null
     }
   },
 
@@ -77,22 +91,24 @@ export default {
 
   mounted() {
     document.addEventListener("click", this.handleClickOutside);
+    document.addEventListener("click", this.handleClickInside);
   },
 
   unmounted() {
     document.removeEventListener("click", this.handleClickOutside);
+    document.removeEventListener("click", this.handleClickInside);
   },
 
   computed: {
     getActiveId() {
-      return _.get(this.items[this.arrowCounter], "id", null);
+      return _.get(this.items[this.arrowCounter], this.keyText, null);
     }
   },
 
   watch: {
-    initialSearch(val) {
-      if (!this.search && val) {
-        this.search = val;
+    modelValue(value) {
+      if (value && !this.search) {
+        this.search = this.isObject ? value[this.valueText] : value;
       }
     }
   },
@@ -105,11 +121,24 @@ export default {
       }
     },
 
-    // debounce to optimize API calls
-    onChange: _.debounce(function () {
-      this.$emit("search-update", this.search);
+    handleClickInside(event) {
+      if (
+        this.$el.contains(event.target) &&
+        !this.result &&
+        !this.isOpen &&
+        this.items.length > 0 &&
+        this.search
+      ) {
+        this.arrowCounter = -1;
+        this.isOpen = true;
+      }
+    },
 
-      if (this.search) {
+    // debounce to optimize API calls
+    onChange: _.debounce(function (value) {
+      this.$emit("search-update", value);
+
+      if (value) {
         this.isOpen = true;
       } else {
         this.isOpen = false;
@@ -117,7 +146,8 @@ export default {
     }, 500),
 
     setResult(val) {
-      this.search = _.get(val, "label", null);
+      this.search = _.get(val, this.valueText, null);
+      this.result = val;
       this.isOpen = false;
       this.$emit("result-update", val);
 
@@ -156,7 +186,8 @@ $width: 100%;
 
 .autocomplete {
   position: relative;
-  width: 400px;
+  max-width: 400px;
+  width: $width;
 
   &__label {
     font-size: 12px;

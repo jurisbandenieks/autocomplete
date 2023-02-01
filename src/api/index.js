@@ -12,11 +12,5 @@ export async function fetchLocations(inputText) {
   });
   const url = "https://api.locationiq.com/v1/autocomplete.php?";
 
-  const { data } = await axios.get(url + queryParams);
-
-  const dataWithId = data.map((el) => {
-    return { ...el, id: el.place_id, label: el.display_name };
-  });
-
-  return dataWithId;
+  return await axios.get(url + queryParams);
 }

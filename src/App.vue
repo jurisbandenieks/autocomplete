@@ -1,25 +1,27 @@
 <template>
   <!-- From vuejs team -->
   <!-- One caveat is that browsers ignore any form of preventing the submit when the form contains only one input element. only god knows why, but that’s how it is. -->
-  <form @submit.prevent="handleSubmit()">
-    <autocomplete
-      :initial-search="initialSearch"
-      :items="locations"
-      :clearable="true"
-      :show-avatar="true"
-      label="Locations"
-      @search-update="getLocations"
-      @result-update="(e) => (location = e)"
-    >
-      <template v-if="loading" v-slot:loading
-        ><li>Loading results...</li>
-      </template>
-    </autocomplete>
-  </form>
+  <!-- <form> -->
+  <autocomplete
+    v-model="search"
+    :items="locations"
+    :clearable="true"
+    :show-avatar="true"
+    :is-object="true"
+    key-text="place_id"
+    value-text="display_name"
+    label="Locations"
+    @search-update="getLocations"
+    @result-update="setLocation"
+  >
+    <template v-if="loading" v-slot:loading
+      ><li>Loading results...</li>
+    </template>
+  </autocomplete>
+  <!-- </form> -->
 </template>
 
 <script>
-import _ from "lodash";
 import Autocomplete from "@/components/inputs/Autocomplete.vue";
 import { fetchLocation, fetchLocations } from "@/api";
 
@@ -31,7 +33,7 @@ export default {
 
   data() {
     return {
-      initialSearch: "",
+      search: null,
       locations: [],
       location: {},
       loading: false
@@ -44,7 +46,7 @@ export default {
       const { data } = await fetchLocation();
 
       if (data) {
-        this.initialSearch = _.get(data, "display_name", "");
+        this.search = data;
       }
     } catch (err) {
       console.error(err);
@@ -57,7 +59,7 @@ export default {
         this.loading = true;
 
         try {
-          const data = await fetchLocations(inputText);
+          const { data } = await fetchLocations(inputText);
 
           if (data && data.length > 0) {
             this.locations = data;
@@ -71,8 +73,9 @@ export default {
         this.locations = [];
       }
     },
-    handleSubmit() {
-      console.log("Subitting ->>", this.location);
+    setLocation(val) {
+      this.location = val;
+      console.log("Location ->>", this.location);
     }
   }
 };
